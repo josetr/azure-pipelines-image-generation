@@ -10,11 +10,15 @@ $InstallerURI = 'https://download.microsoft.com/download/c/a/c/cac076be-2940-4a9
 $InstallerName = 'vs_Enterprise.exe'
 $ArgumentList = ('/Full', '/Quiet', '/NoRestart' )
 $exitCode = Install-EXE -Url $InstallerURI -Name $InstallerName -ArgumentList $ArgumentList
+$devenvPath = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe";
 
 # Find the version of VS installed for this instance
 $regKey = "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 $installedApplications = Get-ItemProperty -Path $regKey
 $VisualStudioVersion = ($installedApplications | Where-Object { $_.DisplayName -and $_.DisplayName.toLower().Contains("visual studio enterprise") } | Select-Object -First 1).DisplayVersion
 Write-Host "Visual Studio version" $VisualStudioVersion "installed"
+
+# Initialize Visual Studio Experimental Instance for integration testing
+&"$devenvPath" /RootSuffix Exp /ResetSettings General.vssettings /Command File.Exit | Wait-Process
 
 exit $exitCode
